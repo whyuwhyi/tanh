@@ -103,14 +103,14 @@ Verification on 1,000,000 random test cases:
 
 ```
 Total:  1,000,000 test cases
-Pass:     440,975 (44.10%)
-Fail:     559,025 (55.90%)
+Pass:     344767 (34.48%)
+Fail:     655233 (65.52%)
 
-Average Error: 6.122838e-06
-Maximum Error: 7.688999e-05
+Average Error: 9.445853e-06
+Maximum Error: 3.254213e-04
 
-Average ULP: 109.84
-Maximum ULP: 5456
+Average ULP: 132.04
+Maximum ULP: 5457
 
 Total Cycles: 1,000,073
 Throughput:   1 result/cycle
@@ -120,14 +120,14 @@ Throughput:   1 result/cycle
 
 ```
 Total:  1,000,000 test cases
-Pass:     454,959 (45.50%)
-Fail:     545,041 (54.50%)
+Pass:     356805 (35.68%)
+Fail:     643195 (64.32%)
 
-Average Error: 6.167674e-06
-Maximum Error: 7.730722e-05
+Average Error: 9.523978e-06
+Maximum Error: 3.309153e-04
 
-Average ULP: 111.08
-Maximum ULP: 5540
+Average ULP: 133.36
+Maximum ULP: 5549
 
 Total Cycles: 1,000,073
 Throughput:   1 result/cycle
@@ -169,21 +169,17 @@ The generated SystemVerilog will be placed in `rtl/TANHFP32.sv`.
 
 ### Build and Run Simulation
 
-#### CPU Reference (no GPU required)
-
 ```bash
-make USE_GPU_REF=0 run
+make run
 ```
 
-Uses standard C library `tanhf()` function as the reference.
+The build system automatically detects CUDA availability:
 
-#### GPU Reference (requires NVIDIA GPU + CUDA)
-
-```bash
-make USE_GPU_REF=1 run
-```
-
-Uses NVIDIA CUDA math library with `-use_fast_math` flag for hardware-accurate reference.
+- **Without CUDA**: Uses CPU reference only (standard C library `tanhf()`)
+- **With CUDA**: Uses both CPU and GPU references simultaneously
+  - CPU Reference: Standard C library `tanhf()`
+  - GPU Reference: NVIDIA CUDA math library with `-use_fast_math` flag
+  - Both error statistics are computed and displayed for comparison
 
 ### Clean Build Artifacts
 
@@ -205,13 +201,17 @@ Verilator-based testbench with:
 
 ### Reference Models
 
-- **CPU Reference**: Standard C library (`tanhf`)
-- **GPU Reference**: NVIDIA CUDA math library with `-use_fast_math` (recommended for hardware comparison)
+The testbench automatically uses available reference implementations:
+
+- **CPU Reference**: Standard C library (`tanhf`) - always available
+- **GPU Reference**: NVIDIA CUDA math library with `-use_fast_math` - automatically enabled if CUDA is detected
+
+When both references are available, error statistics are computed against both to provide comprehensive verification.
 
 ### Accuracy Metrics
 
 - **ULP Error**: Measures floating-point accuracy in terms of "units in the last place"
-- **Absolute Error**: Direct numerical difference between result and reference
+- **Relative Error**: Standard floating-point error metrics
 - **Pass/Fail**: Bit-exact comparison against reference implementation
 
 ## Future Improvements
